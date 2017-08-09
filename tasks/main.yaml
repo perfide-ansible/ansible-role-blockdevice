@@ -1,0 +1,81 @@
+---
+
+- name: partition devices
+  parted:
+    align: "{{ item.align | default(omit) }}"
+    device: "{{ item.device }}"
+    flags: "{{ item.flags | default(omit) }}"
+    label: "{{ item.label | default(omit) }}"
+    name: "{{ item.name | default(omit) }}"
+    number: "{{ item.number | default(1) }}"
+    part_end: "{{ item.part_end | default(omit) }}"
+    part_start: "{{ item.part_start | default(omit) }}"
+    part_type: "{{ item.part_type | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    unit: "{{ item.unit | default(omit) }}"
+  with_items: "{{ blockdevice_partitions | default([]) }}"
+
+- name: make filesystems
+  filesystem:
+    dev: "{{ item.dev }}"
+    force: "{{ item.force | default(omit) }}"
+    fstype: "{{ item.fstype | default('ext4') }}"
+    opts: "{{ item.opts | default(omit) }}"
+    resizefs: "{{ item.resizefs | default(omit) }}"
+  with_items: "{{ blockdevice_filesystems | default([]) }}"
+
+- name: mount filesystems
+  mount:
+    boot: "{{ item.boot | default(omit) }}"
+    dump: "{{ item.dump | default(omit) }}"
+    fstab: "{{ item.fstab | default(omit) }}"
+    fstype: "{{ item.fstype | default(omit) }}"
+    opts: "{{ item.opts | default(omit) }}"
+    passno: "{{ item.passno | default(omit) }}"
+    path: "{{ item.path }}"
+    src: "{{ item.src | default(omit) }}"
+    state: "{{ item.state | default('mounted') }}"
+  with_items: "{{ blockdevice_mounts | default([]) }}"
+
+- name: check if .git exists in /etc
+  stat:
+    path: /etc/.git
+  register: git_exists
+  always_run: yes
+
+- name: git reset
+  command: git reset
+  args:
+    chdir: /etc
+  register: git_reset
+  changed_when: git_reset.stdout
+  when: git_exists.stat.exists
+
+- name: check status of common account files
+  command: git status --porcelain -- fstab vfstab
+  args:
+    chdir: /etc
+  register: git_status
+  always_run: yes
+  changed_when: git_status.stdout
+  when: git_exists.stat.exists
+
+- name: git add changed files
+  command: git add --all -- fstab vfstab
+  args:
+    chdir: /etc
+  when:
+  - 'skipped' not in git_status
+  - git_status.stdout
+
+- name: git commit changes
+  command: git commit -m "autocommit after ansible-role-blockdevice"
+  args:
+    chdir: /etc
+  ignore_errors: True
+  when:
+  - 'skipped' not in git_status
+  - git_status.stdout
+
+
+...

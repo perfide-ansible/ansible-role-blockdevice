@@ -1,0 +1,22 @@
+---
+
+galaxy_info:
+  author: Per H. <github.com/perfide>
+  description: Prepare and mount filesystems
+  galaxy_tags:
+  - parted
+  - partition
+  - filesystem
+  - parted
+  - mount
+  license: BSD-3
+  min_ansible_version: 1.7
+  platforms:
+  - name: Debian
+    versions:
+    - all
+  - name: Ubuntu
+    versions:
+    - all
+
+...
