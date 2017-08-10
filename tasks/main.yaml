@@ -52,7 +52,7 @@
   when: git_exists.stat.exists
 
 - name: check status of common account files
-  command: git status --porcelain -- fstab vfstab
+  command: git status --porcelain -- *fstab
   args:
     chdir: /etc
   register: git_status
@@ -61,11 +61,11 @@
   when: git_exists.stat.exists
 
 - name: git add changed files
-  command: git add --all -- fstab vfstab
+  command: git add --all -- *fstab
   args:
     chdir: /etc
   when:
-  - 'skipped' not in git_status
+  - "'skipped' not in git_status"
   - git_status.stdout
 
 - name: git commit changes
@@ -74,7 +74,7 @@
     chdir: /etc
   ignore_errors: True
   when:
-  - 'skipped' not in git_status
+  - "'skipped' not in git_status"
   - git_status.stdout
 
 
