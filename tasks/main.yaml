@@ -1,19 +1,20 @@
 ---
 
-- name: partition devices
-  parted:
-    align: "{{ item.align | default(omit) }}"
-    device: "{{ item.device }}"
-    flags: "{{ item.flags | default(omit) }}"
-    label: "{{ item.label | default(omit) }}"
-    name: "{{ item.name | default(omit) }}"
-    number: "{{ item.number | default(1) }}"
-    part_end: "{{ item.part_end | default(omit) }}"
-    part_start: "{{ item.part_start | default(omit) }}"
-    part_type: "{{ item.part_type | default(omit) }}"
-    state: "{{ item.state | default('present') }}"
-    unit: "{{ item.unit | default(omit) }}"
-  with_items: "{{ blockdevice_partitions | default([]) }}"
+# parted requires ansible 2.3
+#- name: partition devices
+#  parted:
+#    align: "{{ item.align | default(omit) }}"
+#    device: "{{ item.device }}"
+#    flags: "{{ item.flags | default(omit) }}"
+#    label: "{{ item.label | default(omit) }}"
+#    name: "{{ item.name | default(omit) }}"
+#    number: "{{ item.number | default(1) }}"
+#    part_end: "{{ item.part_end | default(omit) }}"
+#    part_start: "{{ item.part_start | default(omit) }}"
+#    part_type: "{{ item.part_type | default(omit) }}"
+#    state: "{{ item.state | default('present') }}"
+#    unit: "{{ item.unit | default(omit) }}"
+#  with_items: "{{ blockdevice_partitions | default([]) }}"
 
 - name: make filesystems
   filesystem:
