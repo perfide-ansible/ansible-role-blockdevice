@@ -33,10 +33,29 @@
     fstype: "{{ item.fstype | default(omit) }}"
     opts: "{{ item.opts | default(omit) }}"
     passno: "{{ item.passno | default(omit) }}"
-    path: "{{ item.path }}"
+    name: "{{ item.path }}"
     src: "{{ item.src | default(omit) }}"
     state: "{{ item.state | default('mounted') }}"
   with_items: "{{ blockdevice_mounts | default([]) }}"
+
+- name: create bind mount dirs
+  file:
+    state: directory
+    path: "{{ item.src }}"
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+  with_items: "{{ blockdevice_bind_mounts | default([]) }}"
+
+- name: mount filesystems
+  mount:
+    boot: "{{ item.boot | default(omit) }}"
+    fstab: "{{ item.fstab | default(omit) }}"
+    fstype: none
+    opts: bind
+    name: "{{ item.path }}"
+    src: "{{ item.src }}"
+    state: "{{ item.state | default('mounted') }}"
+  with_items: "{{ blockdevice_bind_mounts | default([]) }}"
 
 - name: check if .git exists in /etc
   stat:
