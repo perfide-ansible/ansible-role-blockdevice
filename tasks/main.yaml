@@ -61,7 +61,7 @@
   stat:
     path: /etc/.git
   register: git_exists
-  always_run: yes
+  check_mode: false
 
 - name: git reset
   command: git reset
@@ -76,7 +76,7 @@
   args:
     chdir: /etc
   register: git_status
-  always_run: yes
+  check_mode: false
   changed_when: git_status.stdout
   when: git_exists.stat.exists
 
