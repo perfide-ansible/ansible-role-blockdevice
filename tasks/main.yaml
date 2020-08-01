@@ -1,5 +1,14 @@
 ---
 
+- name: install xfsprogs
+  apt:
+    state: present
+    name: xfsprogs
+    dpkg_options: force-confdef,force-confnew,force-confmiss
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time|default(86400) }}"  # 24h
+  when: "'xfs' in blockdevice_filesystems | default([]) | map(attribute='fstype')"
+
 # parted requires ansible 2.3
 #- name: partition devices
 #  parted:
